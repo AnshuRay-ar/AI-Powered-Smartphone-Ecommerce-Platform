@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en"
+      xmlns:th="http://www.thymeleaf.org">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Your Cart — Anshu Store</title>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet"
+          th:href="@{/css/style.css}">
+
+    <style>
+
+        /* ── CART ITEM CARD ──────────────────────── */
+        .cart-card {
+            background: #ffffff;
+            border: 1px solid rgba(20,20,43,0.09);
+            border-radius: 20px;
+            padding: 22px 26px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 16px rgba(20,20,43,0.06),
+                        0 4px 20px rgba(20,20,43,0.03);
+            transition: transform 0.32s cubic-bezier(0.25,0.8,0.25,1),
+                        box-shadow 0.32s cubic-bezier(0.25,0.8,0.25,1);
+        }
+
+        .cart-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 40px rgba(20,20,43,0.11),
+                        0 2px 8px rgba(20,20,43,0.06);
+        }
+
+        /* ── CART IMAGE ──────────────────────────── */
+        .cart-image-wrap {
+            width: 130px;
+            height: 130px;
+            background: #f7f5f1;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .cart-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            padding: 10px;
+            transition: transform 0.32s ease;
+        }
+
+        .cart-card:hover .cart-image {
+            transform: scale(1.07);
+        }
+
+        /* ── BRAND BADGE ─────────────────────────── */
+        .brand-badge {
+            display: inline-block;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #2563eb;
+            background: rgba(37,99,235,0.08);
+            padding: 3px 12px;
+            border-radius: 100px;
+            margin-bottom: 8px;
+        }
+
+        /* ── PHONE NAME ──────────────────────────── */
+        .cart-phone-name {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #14142b;
+            margin-bottom: 4px;
+            letter-spacing: -0.01em;
+        }
+
+        .cart-phone-desc {
+            font-size: 0.82rem;
+            color: #72728a;
+            margin-bottom: 0;
+        }
+
+        /* ── PRICE ───────────────────────────────── */
+        .cart-price {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #14142b;
+            letter-spacing: -0.02em;
+        }
+
+        /* ── REMOVE BTN — off-white → red ───────── */
+        .btn-remove {
+            border: 1.5px solid rgba(20,20,43,0.12);
+            background: #f5f3ee;
+            color: #72728a;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.32s ease;
+        }
+
+        .btn-remove:hover {
+            background: rgba(232,65,90,0.06);
+            border-color: #e8415a;
+            color: #e8415a;
+            box-shadow: 0 4px 14px rgba(232,65,90,0.15);
+        }
+
+        /* ── SUMMARY CARD ────────────────────────── */
+        .summary-card {
+            background: #ffffff;
+            border: 1px solid rgba(20,20,43,0.09);
+            border-radius: 22px;
+            padding: 32px 30px 36px;
+            box-shadow: 0 2px 16px rgba(20,20,43,0.07),
+                        0 6px 28px rgba(20,20,43,0.04);
+            position: sticky;
+            top: 90px;
+        }
+
+        .summary-card-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #14142b;
+            letter-spacing: -0.02em;
+            margin-bottom: 24px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            color: #72728a;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(20,20,43,0.07);
+        }
+
+        .summary-total-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 16px;
+            margin-top: 4px;
+        }
+
+        .summary-total-label {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #14142b;
+        }
+
+        .summary-total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #14142b;
+            letter-spacing: -0.02em;
+        }
+
+        .free-tag {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: #16a34a;
+            background: rgba(22,163,74,0.09);
+            padding: 2px 10px;
+            border-radius: 100px;
+        }
+
+        /* ── CHECKOUT BTN — off-white → blue ────── */
+        .btn-checkout {
+            width: 100%;
+            background: #f5f3ee;
+            color: #14142b;
+            border: 1.5px solid rgba(20,20,43,0.15);
+            border-radius: 100px;
+            padding: 14px;
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 22px;
+            transition: background 0.32s ease, color 0.32s ease,
+                        border-color 0.32s ease, box-shadow 0.32s ease,
+                        transform 0.18s;
+        }
+
+        .btn-checkout:hover {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 8px 24px rgba(37,99,235,0.28);
+            transform: translateY(-1px);
+        }
+
+        /* ── CLEAR CART BTN — off-white → red ───── */
+        .btn-clear {
+            width: 100%;
+            background: #f5f3ee;
+            color: #72728a;
+            border: 1.5px solid rgba(20,20,43,0.12);
+            border-radius: 100px;
+            padding: 11px;
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 0.82rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-top: 12px;
+            transition: all 0.32s ease;
+        }
+
+        .btn-clear:hover {
+            background: rgba(232,65,90,0.05);
+            border-color: #e8415a;
+            color: #e8415a;
+            box-shadow: 0 4px 14px rgba(232,65,90,0.12);
+        }
+
+        /* ── EMPTY CART ──────────────────────────── */
+        .empty-cart {
+            text-align: center;
+            padding: 90px 20px;
+            background: #ffffff;
+            border: 1px solid rgba(20,20,43,0.09);
+            border-radius: 22px;
+            box-shadow: 0 2px 16px rgba(20,20,43,0.06);
+        }
+
+        .empty-cart-icon {
+            font-size: 4rem;
+            margin-bottom: 16px;
+            opacity: 0.55;
+            display: block;
+        }
+
+        .empty-cart h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #14142b;
+            margin-bottom: 10px;
+        }
+
+        .empty-cart p {
+            font-size: 0.9rem;
+            color: #72728a;
+            margin-bottom: 0;
+        }
+
+        /* ── BROWSE BTN — off-white → blue ──────── */
+        .btn-browse {
+            display: inline-block;
+            margin-top: 24px;
+            background: #f5f3ee;
+            color: #14142b;
+            border: 1.5px solid rgba(20,20,43,0.15);
+            padding: 13px 32px;
+            border-radius: 100px;
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-decoration: none;
+            transition: background 0.32s ease, color 0.32s ease,
+                        border-color 0.32s ease, box-shadow 0.32s ease,
+                        transform 0.18s;
+        }
+
+        .btn-browse:hover {
+            background: #2563eb;
+            color: #ffffff;
+            border-color: #2563eb;
+            box-shadow: 0 8px 24px rgba(37,99,235,0.28);
+            transform: translateY(-2px);
+        }
+
+        /* ── PAGE HEADING ────────────────────────── */
+        .page-head h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: clamp(1.8rem, 4vw, 2.5rem);
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #14142b;
+            margin-bottom: 6px;
+        }
+
+        .page-head h1::after {
+            content: '';
+            display: block;
+            width: 36px;
+            height: 3px;
+            background: #2563eb;
+            border-radius: 2px;
+            margin-top: 10px;
+        }
+
+        .page-head p {
+            color: #72728a;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<!-- ── NAVBAR ─────────────────────────────────── -->
+<nav class="navbar navbar-expand-lg">
+
+    <div class="container-fluid px-4">
+
+        <a class="navbar-brand" href="/">
+            📱 Anshu Store
+        </a>
+
+        <div class="ms-auto">
+            <a href="/" class="nav-action-btn">
+                ← Continue Shopping
+            </a>
+        </div>
+
+    </div>
+
+</nav>
+
+<!-- ── CART SECTION ───────────────────────────── -->
+<div class="container py-5" style="max-width:1200px;">
+
+    <!-- Page Heading -->
+    <div class="page-head mb-5">
+
+        <h1>🛒 Your Cart</h1>
+
+        <p>
+            Review your selected phones before checkout.
+        </p>
+
+    </div>
+
+    <!-- ── EMPTY CART ─────────────────────────── -->
+    <div th:if="${#lists.isEmpty(cart)}"
+         class="empty-cart">
+
+        <span class="empty-cart-icon">🛒</span>
+
+        <h2>Your cart is empty</h2>
+
+        <p>
+            Add some amazing phones to get started.
+        </p>
+
+        <a href="/" class="btn-browse">
+            Browse Phones →
+        </a>
+
+    </div>
+
+    <!-- ── CART CONTENT ───────────────────────── -->
+    <div class="row g-4"
+         th:unless="${#lists.isEmpty(cart)}">
+
+        <!-- Left — Cart Items -->
+        <div class="col-lg-8">
+
+            <div class="cart-card"
+                 th:each="item : ${cart}">
+
+                <div class="d-flex align-items-center gap-4">
+
+                    <!-- Image -->
+                    <a th:href="@{/phone/{id}(id=${item.id})}"
+                       style="flex-shrink:0;">
+
+                        <div class="cart-image-wrap">
+
+                            <img th:src="@{${item.imageUrl}}"
+                                 th:alt="${item.name}"
+                                 class="cart-image">
+
+                        </div>
+
+                    </a>
+
+                    <!-- Info -->
+                    <div class="flex-grow-1 min-width-0">
+
+                        <span class="brand-badge"
+                              th:text="${item.brand}">
+                        </span>
+
+                        <h5 class="cart-phone-name"
+                            th:text="${item.name}">
+                        </h5>
+
+                        <p class="cart-phone-desc"
+                           th:text="${item.description}">
+                        </p>
+
+                    </div>
+
+                    <!-- Price + Remove -->
+                    <div class="d-flex flex-column
+                                align-items-end gap-3
+                                flex-shrink-0">
+
+                        <div class="cart-price">
+                            ₹<span th:text="${#numbers.formatDecimal(
+                                item.price,1,'COMMA',0,'POINT')}">
+                            </span>
+                        </div>
+
+                        <form th:action="@{/cart/remove/{id}(id=${item.id})}"
+                              method="post">
+
+                            <button type="submit"
+                                    class="btn-remove"
+                                    title="Remove">
+                                ✕
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <!-- Right — Summary -->
+        <div class="col-lg-4">
+
+            <div class="summary-card">
+
+                <div class="summary-card-title">
+                    Order Summary
+                </div>
+
+                <div class="summary-row">
+                    <span>Total Items</span>
+                    <span th:text="${cart.size()}"></span>
+                </div>
+
+                <div class="summary-row">
+                    <span>Shipping</span>
+                    <span class="free-tag">FREE</span>
+                </div>
+
+                <div class="summary-total-row">
+
+                    <span class="summary-total-label">
+                        Total
+                    </span>
+
+                    <span class="summary-total-amount">
+                        ₹<span th:text="${#numbers.formatDecimal(
+                            total,1,'COMMA',0,'POINT')}">
+                        </span>
+                    </span>
+
+                </div>
+
+                <!-- Checkout -->
+                <button class="btn-checkout">
+                    Proceed to Checkout →
+                </button>
+
+                <!-- Clear Cart -->
+                <form action="/cart/clear" method="post">
+
+                    <button type="submit"
+                            class="btn-clear"
+                            onclick="return confirm(
+                                'Clear the entire cart?')">
+                        Clear Cart
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- ── FOOTER ─────────────────────────────────── -->
+<footer>
+    <p>© 2026 Anshu Phone Store. All Rights Reserved.</p>
+</footer>
+
+<!-- Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>
